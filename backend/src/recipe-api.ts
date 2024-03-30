@@ -1,4 +1,4 @@
-const apiKey = process.env.API_KEY;
+const apiKey = "e37838d7044e417fb003d707e5bf2da6";
 
 export const searchRecipes = async (searchTerm: string, page: number)=> {
   if(!apiKey) {
@@ -23,4 +23,8 @@ export const searchRecipes = async (searchTerm: string, page: number)=> {
   } catch (error) {
     console.log(error);
   }
-};
+}
+
+export const getRecipeSummery = async(recipeId:string)=> {
+  const url = new URL(`https://api.spoonacular.com/recipes/{id}/summary`);
+}
