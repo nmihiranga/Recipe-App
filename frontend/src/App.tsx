@@ -1,15 +1,32 @@
-import { FormEvent, useRef, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import "./App.css";
 import * as api from './api';
 import { Recipe } from "./types";
 import RecipeCard from "./components/RecipeCard";
 import RecipeModal from "./components/RecipeModal";
 
+type Tabs = "search" | 'favourites';
+
 const App = ()=> {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe| undefined>(undefined);
+  const [selectedTab, setSelectedTab] = useState<Tabs>("search");
+  const [favouriteRecipes, setFavouriteRecipes] = useState<Recipe[]> ([])
   const pageNumber = useRef(1);
+
+  useEffect(()=> {
+    const fetchFavouriteRecipes = async ()=> {
+      try {
+        const favouriteRecipes = await api.getFavouriteRecipes();
+        setFavouriteRecipes(favouriteRecipes.reults);
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+    fetchFavouriteRecipes();
+  }, []);
 
   const handleSearchSubmit = async(event: FormEvent)=> {
     event.preventDefault();
@@ -39,7 +56,13 @@ const App = ()=> {
 
   return (
     <div>
-      <form onSubmit={(event)=> handleSearchSubmit(event)}>
+      <div className="tabs">
+        <h1 onClick={()=> setSelectedTab("search")}>Recipe Search</h1>
+        <h1 onClick={()=> setSelectedTab("favourites")}>Favourites</h1>
+      </div>
+
+      {selectedTab === "search" && (<>
+        <form onSubmit={(event)=> handleSearchSubmit(event)}>
         <input 
           type="text" 
           required 
@@ -62,6 +85,17 @@ const App = ()=> {
       >
         View More
       </button>
+      </>)}
+
+      {selectedTab === "favourites" && (
+        <div>
+          {favouriteRecipes.map((recipe)=> (
+            <RecipeCard 
+              recipe={recipe}
+              onClick={()=> setSelectedRecipe(recipe)}
+          />))}
+        </div>
+      )}
       
       {selectedRecipe ? 
       <RecipeModal recipeId={selectedRecipe.id.toString()} 
