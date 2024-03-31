@@ -25,6 +25,17 @@ export const searchRecipes = async (searchTerm: string, page: number)=> {
   }
 }
 
-export const getRecipeSummery = async(recipeId:string)=> {
-  const url = new URL(`https://api.spoonacular.com/recipes/{id}/summary`);
+export const getRecipeSummary = async(recipeId:string)=> {
+  const url = new URL(`https://api.spoonacular.com/recipes/${recipeId}/summary`);
+
+  const params = {
+    apiKey: apiKey
+  }
+
+  url.search = new URLSearchParams(params).toString();
+
+  const response = await fetch(url);
+  const json = await response.json();
+
+  return json;
 }
